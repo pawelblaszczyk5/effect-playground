@@ -6,29 +6,40 @@ import * as LoggerLevel from "@effect/io/Logger/Level";
 
 const program = Effect.sync(() => "Hello, world!");
 
-const result = Effect.runSync(program);
-
-console.log(result);
+Effect.runSync(program.pipe(Effect.tap(Effect.log)));
 
 // Pipes
 
+const now = Effect.sync(() => Date.now());
+
+const elapsed = <R, E, A>(self: Effect.Effect<R, E, A>): Effect.Effect<R, E, A> =>
+	Effect.Do.pipe(
+		Effect.bind("startMilliseconds", () => now),
+		Effect.bind("result", () => self),
+		Effect.bind("endMilliseconds", () => now),
+		Effect.tap(({ endMilliseconds, startMilliseconds }) =>
+			Effect.log(`Elapsed: ${endMilliseconds - startMilliseconds}`),
+		),
+		Effect.map(({ result }) => result),
+	);
+
 const addSuffix = (input: string) => Effect.succeed(`${input}-example-suffix`);
 
-const examplePipe = Effect.succeed("test" as const).pipe(
-	Effect.flatMap(value => addSuffix(value)),
-	Effect.tap(Effect.log),
-	Effect.tap(() => Effect.sleep("5 seconds")),
-	Effect.flatMap(value =>
-		Effect.if(value === "text-example-suffix", {
-			onFalse: Effect.succeed("correct"),
-			onTrue: Effect.succeed("invalid"),
-		}),
-	),
-	Effect.flatMap(value => addSuffix(value)),
-	Effect.tap(value => Effect.log(value, { level: "Trace" })),
-	Logger.withMinimumLogLevel(LoggerLevel.fromLiteral("All")),
-);
+const examplePipe = (self: Effect.Effect<never, never, string>) =>
+	self.pipe(
+		Effect.flatMap(value => addSuffix(value)),
+		Effect.tap(Effect.log),
+		Effect.tap(() => Effect.sleep("5 seconds")),
+		Effect.flatMap(value =>
+			Effect.if(value === "test-example-suffix", {
+				onFalse: Effect.succeed("invalid"),
+				onTrue: Effect.succeed("correct"),
+			}),
+		),
+		Effect.tap(value => Effect.log(value, { level: "Trace" })),
+		Logger.withMinimumLogLevel(LoggerLevel.fromLiteral("All")),
+		elapsed,
+	);
 
-const pipeResult = await Effect.runPromise(examplePipe);
-
-console.log(pipeResult);
+void Effect.runPromise(Effect.succeed("test").pipe(examplePipe));
+void Effect.runPromise(Effect.succeed("test2").pipe(examplePipe));
