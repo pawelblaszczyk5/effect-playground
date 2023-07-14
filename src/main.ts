@@ -1,6 +1,4 @@
-import * as Effect from "@effect/io/Effect";
-import * as Logger from "@effect/io/Logger";
-import * as LoggerLevel from "@effect/io/Logger/Level";
+import { Effect, Logger, LoggerLevel } from "effect";
 
 //  Effect program
 
