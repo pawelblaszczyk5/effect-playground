@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"baseUrl": ".",
 		"lib": ["ESNext"],
 		"module": "esnext",
 		"target": "esnext",
@@ -24,7 +25,11 @@
 		"allowJs": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"paths": {
+			"~/*": ["src/*"],
+			"~": ["src"]
+		}
 	},
 	"include": ["**/*.ts"]
 }
