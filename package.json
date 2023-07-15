@@ -6,10 +6,10 @@
 		"dev": "bun --watch src/main.ts"
 	},
 	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^6.0.0",
+		"@typescript-eslint/parser": "^6.0.0",
 		"bun-types": "^0.6.14",
-		"prettier": "^3.0.0",
-		"typescript": "^5.1.6",
-		"eslint": "^8.44.0",
+		"eslint": "^8.45.0",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-import-resolver-typescript": "^3.5.5",
 		"eslint-plugin-canonical": "^4.4.4",
@@ -17,15 +17,13 @@
 		"eslint-plugin-fp": "^2.3.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-node": "^11.1.0",
-		"eslint-plugin-perfectionist": "^1.4.0",
+		"eslint-plugin-perfectionist": "^1.5.0",
 		"eslint-plugin-prefer-arrow-functions": "^3.1.4",
 		"eslint-plugin-promise": "^6.1.1",
 		"eslint-plugin-regexp": "^1.15.0",
-		"eslint-plugin-storybook": "^0.6.12",
-		"eslint-plugin-svelte": "^2.32.2",
-		"eslint-plugin-unicorn": "^47.0.0",
-		"@typescript-eslint/eslint-plugin": "^6.0.0",
-		"@typescript-eslint/parser": "^6.0.0"
+		"eslint-plugin-unicorn": "^48.0.0",
+		"prettier": "^3.0.0",
+		"typescript": "^5.1.6"
 	},
 	"dependencies": {
 		"effect": "^2.0.0-next.16"
