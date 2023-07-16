@@ -1,4 +1,5 @@
-import { Effect, Logger, LoggerLevel } from "effect";
+import { Context, Effect, Logger, LoggerLevel } from "effect";
+import * as UserServiceLive from "~/user";
 
 //  Effect program
 
@@ -41,3 +42,14 @@ const examplePipe = (self: Effect.Effect<never, never, string>) =>
 
 void Effect.runPromise(Effect.succeed("test").pipe(examplePipe));
 void Effect.runPromise(Effect.succeed("test2").pipe(examplePipe));
+
+const UserService = Context.Tag<typeof import("~/user")>();
+
+const programWithService = UserService.pipe(
+	Effect.flatMap(UserService => Effect.succeed(UserService.getUser())),
+	Effect.tap(user => Effect.log(JSON.stringify(user))),
+);
+
+const runnableProgramWithService = Effect.provideService(programWithService, UserService, UserServiceLive);
+
+Effect.runSync(runnableProgramWithService);
