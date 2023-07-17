@@ -36,7 +36,7 @@ const examplePipe = (self: Effect.Effect<never, never, string>) =>
 				onTrue: Effect.succeed("correct"),
 			}),
 		),
-		Effect.tap(value => Effect.log(value, { level: "Trace" })),
+		Effect.tap(value => Effect.log(value, "Trace")),
 		Logger.withMinimumLogLevel(LoggerLevel.fromLiteral("All")),
 		elapsed,
 	);
