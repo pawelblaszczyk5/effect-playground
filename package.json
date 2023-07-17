@@ -26,6 +26,6 @@
 		"typescript": "^5.1.6"
 	},
 	"dependencies": {
-		"effect": "^2.0.0-next.16"
+		"effect": "^2.0.0-next.17"
 	}
 }
