@@ -11,6 +11,7 @@ const createMissingUserError = createTaggedErrorBuilder("MISSING_USER");
 
 export const getUser = (id: string) =>
 	Effect.succeed(id).pipe(
+		Effect.tap(() => Effect.sleep("2 seconds")),
 		Effect.flatMap(value =>
 			Effect.if(value === "test123", {
 				onFalse: Effect.fail(createMissingUserError()),
@@ -20,6 +21,5 @@ export const getUser = (id: string) =>
 				}),
 			}),
 		),
-		Effect.tap(() => Effect.sleep("2 seconds")),
 		Effect.tap(user => Effect.log(`Successfully fetched user with id ${user.id}`)),
 	);
