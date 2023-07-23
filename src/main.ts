@@ -38,6 +38,15 @@ await Effect.runPromise(
 				onSuccess: username => Effect.log(`Fetching username succeeded - ${username}`),
 			}),
 		),
+		getUserName("UUID81238123").pipe(
+			Effect.provideService(UserService, {
+				getUser: () => Effect.fail({ _tag: "MISSING_USER" } as const).pipe(Effect.tap(() => Effect.sleep("6 seconds"))),
+			}),
+			Effect.matchEffect({
+				onFailure: ({ _tag }) => Effect.log(`Fetching username errored with a tag ${_tag}`),
+				onSuccess: username => Effect.log(`Fetching username succeeded - ${username}`),
+			}),
+		),
 	]),
 );
 
