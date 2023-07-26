@@ -1,4 +1,4 @@
-import { Context, Effect, Either, Match, Option } from "effect";
+import { Context, Effect, Match, Option } from "effect";
 
 import * as UserServiceLive from "~/user";
 
