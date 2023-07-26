@@ -58,6 +58,6 @@ declare const authState:
 	| { rights: Array<string>; status: "admin" };
 
 const someState = Match.value(authState).pipe(
-	Match.when({ status: "admin" }, data => data.status),
+	Match.discriminators("status")({ admin: ({ status }) => status }),
 	Match.orElse(() => "not logged in as admin" as const),
 );
