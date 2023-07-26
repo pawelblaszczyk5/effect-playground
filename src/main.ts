@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Context, Effect, Match } from "effect";
 
 import * as UserServiceLive from "~/user";
 
@@ -51,3 +51,13 @@ await Effect.runPromise(
 );
 
 Effect.log("Finished").pipe(Effect.runSync);
+
+declare const authState:
+	| { data: { state: Record<string, unknown> }; status: "anonymous" }
+	| { data: { userId: string }; status: "loggedIn" }
+	| { rights: Array<string>; status: "admin" };
+
+const someState = Match.value(authState).pipe(
+	Match.when({ status: "admin" }, data => data.status),
+	Match.orElse(() => "not logged in as admin" as const),
+);
