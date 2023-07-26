@@ -1,4 +1,4 @@
-import { Context, Either, Effect, Match } from "effect";
+import { Context, Effect, Either, Match, Option } from "effect";
 
 import * as UserServiceLive from "~/user";
 
@@ -63,3 +63,9 @@ const matchAuthState = Match.type<AuthState>().pipe(
 const matchResult = matchAuthState({ data: { state: {} }, status: "anonymous" });
 
 console.log(matchResult);
+
+const someOption = Option.some({ test: 5 } as const);
+
+const optionResultOrThrow = someOption.pipe(Option.getOrThrow);
+
+console.log(optionResultOrThrow.test);
