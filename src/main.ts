@@ -1,4 +1,4 @@
-import { Context, Effect, Match } from "effect";
+import { Context, Either, Effect, Match } from "effect";
 
 import * as UserServiceLive from "~/user";
 
@@ -10,7 +10,7 @@ const getUserName = (id: string) =>
 		Effect.flatMap(({ userService }) => userService.getUser(id).pipe(Effect.map(({ username }) => username))),
 	);
 
-await Effect.runPromise(
+void Effect.runPromise(
 	Effect.all([
 		getUserName("test123").pipe(
 			Effect.provideService(UserService, UserServiceLive),
@@ -50,14 +50,16 @@ await Effect.runPromise(
 	]),
 );
 
-Effect.log("Finished").pipe(Effect.runSync);
-
-declare const authState:
+type AuthState =
 	| { data: { state: Record<string, unknown> }; status: "anonymous" }
 	| { data: { userId: string }; status: "loggedIn" }
 	| { rights: Array<string>; status: "admin" };
 
-const someState = Match.value(authState).pipe(
+const matchAuthState = Match.type<AuthState>().pipe(
 	Match.discriminator("status")("admin", ({ status }) => status),
 	Match.orElse(() => "not logged in as admin" as const),
 );
+
+const matchResult = matchAuthState({ data: { state: {} }, status: "anonymous" });
+
+console.log(matchResult);
