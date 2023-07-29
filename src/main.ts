@@ -1,71 +1,23 @@
-import { Context, Effect, Match, Option } from "effect";
+import { Cause, Effect, Exit, Option } from "effect";
 
-import * as UserServiceLive from "~/user";
+import { Database, DatabaseLive } from "~/database";
+import { UserService, UserServiceLive } from "~/user";
 
-const UserService = Context.Tag<typeof import("~/user")>();
-
-const getUserName = (id: string) =>
-	Effect.Do.pipe(
-		Effect.bind("userService", () => UserService),
-		Effect.flatMap(({ userService }) => userService.getUser(id).pipe(Effect.map(({ username }) => username))),
-	);
-
-void Effect.runPromise(
-	Effect.all([
-		getUserName("test123").pipe(
-			Effect.provideService(UserService, UserServiceLive),
-			Effect.matchEffect({
-				onFailure: ({ _tag }) => Effect.log(`Fetching username errored with a tag ${_tag}`),
-				onSuccess: username => Effect.log(`Fetching username succeeded - ${username}`),
-			}),
-		),
-		getUserName("5678").pipe(
-			Effect.provideService(UserService, UserServiceLive),
-			Effect.matchEffect({
-				onFailure: ({ _tag }) => Effect.log(`Fetching username errored with a tag ${_tag}`),
-				onSuccess: username => Effect.log(`Fetching username succeeded - ${username}`),
-			}),
-		),
-		getUserName("UUID81238123").pipe(
-			Effect.provideService(UserService, {
-				getUser: () =>
-					Effect.succeed({ id: "SOME_MOCK_DATA", username: "Jon Test Snow" }).pipe(
-						Effect.tap(() => Effect.sleep("6 seconds")),
-					),
-			}),
-			Effect.matchEffect({
-				onFailure: ({ _tag }) => Effect.log(`Fetching username errored with a tag ${_tag}`),
-				onSuccess: username => Effect.log(`Fetching username succeeded - ${username}`),
-			}),
-		),
-		getUserName("UUID81238123").pipe(
-			Effect.provideService(UserService, {
-				getUser: () => Effect.fail({ _tag: "MISSING_USER" } as const).pipe(Effect.tap(() => Effect.sleep("6 seconds"))),
-			}),
-			Effect.matchEffect({
-				onFailure: ({ _tag }) => Effect.log(`Fetching username errored with a tag ${_tag}`),
-				onSuccess: username => Effect.log(`Fetching username succeeded - ${username}`),
-			}),
-		),
-	]),
+const program = UserService.pipe(
+	Effect.flatMap(userService => userService.getUserName("t")),
+	Effect.tap(userName => Effect.log(userName)),
+	Effect.provideService(UserService, UserServiceLive),
+	Effect.provideService(Database, DatabaseLive),
 );
 
-type AuthState =
-	| { data: { state: Record<string, unknown> }; status: "anonymous" }
-	| { data: { userId: string }; status: "loggedIn" }
-	| { rights: Array<string>; status: "admin" };
+const result = Effect.runSyncExit(program);
 
-const matchAuthState = Match.type<AuthState>().pipe(
-	Match.discriminator("status")("admin", ({ status }) => status),
-	Match.orElse(() => "not logged in as admin" as const),
-);
+if (Exit.isSuccess(result)) {
+	console.log("yaaay");
+	console.log(result.value);
+} else {
+	console.log("naay");
+	const { _tag } = Cause.failureOption(result.cause).pipe(Option.getOrThrow);
 
-const matchResult = matchAuthState({ data: { state: {} }, status: "anonymous" });
-
-console.log(matchResult);
-
-const someOption = Option.some({ test: 5 } as const);
-
-const optionResultOrThrow = someOption.pipe(Option.getOrThrow);
-
-console.log(optionResultOrThrow.test);
+	console.log(_tag);
+}
